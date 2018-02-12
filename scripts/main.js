@@ -21,7 +21,7 @@
 
 'use strict';
 
-const applicationServerPublicKey = 'BIK00HLibw3gX1d';
+const applicationServerPublicKey = 'BLJnGC2LXorGpDreMrkT5ZJ_oFeXSilnzchqxD8-2ARSp5B3jbxMw5OIkuRLM6f8o7ElqC8eGaa2ucsIT26Nu0E';
 
 const pushButton = document.querySelector('.js-push-btn');
 
@@ -66,6 +66,15 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 
 
 function initializeUI() {
+  pushButton.addEventListener('click', function() {
+    pushButton.disabled = true;
+    if (isSubscribed) {
+      //
+    } else {
+      subscribeUser();
+    }
+  });
+
   // Set the initial subscription value
   swRegistration.pushManager.getSubscription()
   .then(function(subscription) {
@@ -89,4 +98,41 @@ function updateBtn() {
   }
 
   pushButton.disabled = false;
+}
+
+
+function subscribeUser() {
+  const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+  swRegistration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: applicationServerKey
+  })
+  .then(function(subscription) {
+    console.log('User is subscribed.');
+
+    updateSubscriptionOnServer(subscription);
+
+    isSubscribed = true;
+
+    updateBtn();
+  })
+  .catch(function(err) {
+    console.log('Failed to subscribe the user: ', err);
+    updateBtn();
+  });
+}
+
+function updateSubscriptionOnServer(subscription) {
+  // TODO: Send subscription to application server
+
+  const subscriptionJson = document.querySelector('.js-subscription-json');
+  const subscriptionDetails =
+    document.querySelector('.js-subscription-details');
+
+  if (subscription) {
+    subscriptionJson.textContent = JSON.stringify(subscription);
+    subscriptionDetails.classList.remove('is-invisible');
+  } else {
+    subscriptionDetails.classList.add('is-invisible');
+  }
 }
