@@ -21,7 +21,7 @@
 
 'use strict';
 
-const applicationServerPublicKey = '<Your Public Key>';
+const applicationServerPublicKey = 'BIK00HLibw3gX1d';
 
 const pushButton = document.querySelector('.js-push-btn');
 
@@ -41,4 +41,22 @@ function urlB64ToUint8Array(base64String) {
     outputArray[i] = rawData.charCodeAt(i);
   }
   return outputArray;
+}
+
+// Register a service worker
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  console.log('Service Worker and Push is supported');
+
+  navigator.serviceWorker.register('sw.js')
+  .then(function(swReg) {
+    console.log('Service Worker is registered', swReg);
+
+    swRegistration = swReg;
+  })
+  .catch(function(error) {
+    console.error('Service Worker Error', error);
+  });
+} else {
+  console.warn('Push messaging is not supported');
+  pushButton.textContent = 'Push Not Supported';
 }
